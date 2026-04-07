@@ -3,319 +3,328 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة التعلم عن بعد الشاملة</title>
+    <title>منصة العنقود الرقمية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary: #2563eb;
-            --success: #10b981;
-            --danger: #ef4444;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text: #1e293b;
+            --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --danger-dark: #b91c1c;
+            --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --gray: #94a3b8; --border: #e2e8f0;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-        }
+        body.dark-mode { --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --gray: #94a3b8; --border: #334155; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; min-height: 100vh; transition: 0.3s; }
 
-        .container { max-width: 600px; margin: 0 auto; }
+        .top-bar { background: var(--card); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border); }
+        .live-date, .live-clock { font-weight: bold; color: var(--primary); font-size: 0.85rem; }
+        #userBadge { background: var(--primary); color: white; padding: 3px 12px; border-radius: 20px; font-size: 0.7rem; margin-left: 8px; display: none; }
+        .theme-toggle { cursor: pointer; font-size: 1.2rem; color: var(--gray); transition: 0.3s; margin-right: 15px; }
 
-        .auth-card {
-            background: var(--card);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            text-align: center;
-            margin-top: 50px;
-        }
+        .welcome-page { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; padding: 20px; }
+        .welcome-frame { background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); padding: 12px; border-radius: 40px; width: 100%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .auth-card { background: var(--card); padding: 30px 20px; border-radius: 32px; text-align: center; }
 
-        .filter-section {
-            background: var(--card);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            border: 1px solid #e2e8f0;
-        }
+        .curved-title-container { width: 100%; height: 100px; display: flex; justify-content: center; align-items: center; }
+        .curved-svg { width: 100%; height: 100%; overflow: visible; }
+        .curved-text { font-size: 34px; font-weight: 900; fill: var(--primary); }
+        .main-logo { width: 90px; height: auto; margin-top: -30px; margin-bottom: 10px; }
+        .designer-tag { font-size: 0.8rem; color: var(--gray); margin-bottom: 20px; }
 
-        select, input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-            font-size: 1rem;
-        }
+        input[type="text"], select { width: 100%; padding: 10px; border-radius: 15px; border: 2px solid var(--border); margin-bottom: 12px; outline: none; text-align: center; font-size: 1rem; background: var(--card); color: var(--text); box-sizing: border-box; }
+        .btn { width: 100%; padding: 16px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; font-size: 1.1rem; }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 6px 0 #1d4ed8; }
+        .btn-exit { background: var(--danger); color: white; box-shadow: 0 6px 0 var(--danger-dark); }
 
-        .lesson-card {
-            background: var(--card);
-            border-radius: 18px;
-            padding: 20px;
-            margin-bottom: 15px;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid #e2e8f0;
-            transition: 0.3s ease;
-        }
+        .btn-status-active { background: var(--success) !important; color: white !important; box-shadow: 0 6px 0 #059669 !important; animation: pulse 2s infinite; }
+        .btn-status-upcoming { background: var(--warning) !important; color: white !important; box-shadow: 0 6px 0 #d97706 !important; opacity: 0.9; }
+        .btn-status-expired { background: var(--gray) !important; color: white !important; box-shadow: 0 6px 0 #64748b !important; cursor: not-allowed; opacity: 0.6; }
+        
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
 
-        .active-lesson {
-            border: 2px solid var(--success);
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
-            background: #f0fdf4;
-        }
+        #connAlert { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: var(--danger); color: white; padding: 10px 20px; border-radius: 30px; display: none; z-index: 9999; font-weight: bold; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); border: 2px solid white; }
 
-        .progress-container {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 5px;
-            background: #f1f5f9;
-        }
+        #mainApp { display: none; padding: 20px; padding-bottom: 100px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 5000; }
+        .modal-content { background: var(--card); padding: 30px; border-radius: 25px; text-align: center; width: 300px; }
 
-        .progress-bar {
-            height: 100%; background: var(--success); width: 0%;
-            transition: width 1s linear;
-        }
+        .admin-stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: var(--card); border: 1px solid var(--border); padding: 10px; border-radius: 20px; text-align: center; }
+        .admin-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; background: var(--card); }
+        .admin-table th { background: rgba(0,0,0,0.02); padding: 10px; border-bottom: 2px solid var(--border); }
+        .admin-table td { padding: 10px; border-bottom: 1px solid var(--border); text-align: center; }
 
-        .btn {
-            display: block; width: 100%; padding: 14px;
-            border-radius: 12px; border: none; font-weight: bold;
-            cursor: pointer; text-decoration: none; text-align: center;
-            margin-top: 10px; font-size: 1rem;
-        }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-outline { border: 1px solid var(--primary); color: var(--primary); background: none; }
-
-        .attendance-log {
-            background: #fff; border-radius: 15px; padding: 15px;
-            margin-top: 20px; border: 1px dashed #cbd5e1;
-            max-height: 400px; overflow-y: auto;
-        }
+        .quick-links-bar { background: var(--card); padding: 12px; display: flex; justify-content: center; gap: 15px; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); border-top: 1px solid var(--border); position: fixed; bottom: 0; width: 100%; z-index: 2000; }
+        .q-link { text-decoration: none; color: var(--text); font-size: 0.75rem; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div id="loginScreen" class="auth-card">
-        <h2>👋 مرحباً بك</h2>
-        <p>أدخل الرمز للدخول (طالب: 1 )</p>
-        <input type="password" id="passCode" placeholder="الرمز السري">
-        <button class="btn btn-primary" onclick="handleLogin()">دخول النظام</button>
+<div id="connAlert"><i class="fas fa-wifi-slash"></i> ضعف في الاتصال.. جاري إعادة المزامنة</div>
+
+<div class="top-bar">
+    <div class="live-date" id="dateDisplay">--/--/----</div>
+    <div style="display: flex; align-items: center;">
+        <i class="fas fa-moon theme-toggle" onclick="toggleTheme()" id="themeIcon"></i>
+        <span id="userBadge"></span>
+        <div class="live-clock" id="clockDisplay">00:00:00</div>
+    </div>
+</div>
+
+<div id="loginScreen" class="welcome-page">
+    <div class="welcome-frame">
+        <div class="auth-card">
+            <div class="curved-title-container">
+                <svg viewBox="0 0 500 160" class="curved-svg">
+                    <path id="curvePath" d="M 50,130 A 200,80 0 0,1 450,130" fill="none" />
+                    <text class="curved-text"><textPath xlink:href="#curvePath" startOffset="50%" text-anchor="middle">منصة العنقود الرقمية</textPath></text>
+                </svg>
+            </div>
+            <img src="https://github.com/Sami-ghannam/Beit-Alroosh-AlTehta-School/blob/main/logo.png?raw=true" alt="Logo" class="main-logo">
+            <div class="designer-tag">تصميم: م. سامي غنام</div>
+            <input type="text" id="sysPass" placeholder="أدخل رمز الدخول">
+            <button class="btn btn-primary" onclick="handleLogin()">دخول للمنصة</button>
+            <button class="btn btn-exit" onclick="showExitModal()">خروج نهائي</button>
+        </div>
+    </div>
+</div>
+
+<div id="mainApp">
+    <div id="adminStatsArea" style="display:none;" class="admin-stats-container">
+        <div class="stat-card"><i class="fas fa-clock"></i><br><span id="statActiveCount" style="font-weight:900;">0</span><br><small>جارية</small></div>
+        <div class="stat-card"><i class="fas fa-check-double"></i><br><span id="statDoneCount" style="font-weight:900;">0</span><br><small>منتهية</small></div>
+        <div class="stat-card"><i class="fas fa-chart-pie"></i><br><span id="statProgress" style="font-weight:900;">0%</span><br><small>الإنجاز</small></div>
     </div>
 
-    <div id="mainApp" style="display:none;">
-        <div style="display:flex; justify-content: space-between; align-items: center;">
-            <h2 id="appTitle">جاري تحميل البيانات...</h2>
-            <button onclick="logout()" style="color:var(--danger); border:none; background:none; cursor:pointer;">خروج</button>
+    <div class="welcome-frame">
+        <div class="auth-card" style="padding: 15px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:10px;">
+                <h4 id="portalTitle" style="margin:0; color:var(--primary);">البوابة</h4>
+                <button onclick="handleLogout()" style="border:none; background:none; color:var(--danger); font-weight:bold; cursor:pointer;">خروج</button>
+            </div>
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px;">
+                <select id="daySelect" onchange="updateUI()"></select>
+                <select id="gradeSelect" onchange="updateUI()">
+                    <option value="">الصف</option>
+                    <script>for(let i=1; i<=12; i++) document.write(`<option value="${i}">${i}</option>`);</script>
+                </select>
+                <select id="sectionSelect" onchange="updateUI()">
+                    <option value="أ">شعبة أ</option>
+                    <option value="ب">شعبة ب</option>
+                    <option value="ج">شعبة ج</option>
+                    <option value="د">شعبة د</option>
+                    <option value="هـ">شعبة هـ</option>
+                    <option value="و">شعبة و</option>
+                </select>
+            </div>
+
+            <div id="adminTeacherFilter" style="display:none; margin-top:5px;">
+                <select id="teacherSelect" onchange="updateUI()"></select>
+            </div>
+
+            <div id="displayArea" style="margin-top: 15px; width: 100%;"></div>
         </div>
+    </div>
+</div>
 
-        <div class="filter-section">
-            <label>📅 اختر اليوم:</label>
-            <select id="daySelect" onchange="updateUI()">
-                <option value="الأحد">الأحد</option>
-                <option value="الاثنين">الاثنين</option>
-                <option value="الثلاثاء">الثلاثاء</option>
-                <option value="الأربعاء">الأربعاء</option>
-                <option value="الخميس">الخميس</option>
-            </select>
+<div class="quick-links-bar">
+    <div class="q-link" onclick="loadData()"><i class="fas fa-sync-alt"></i> تحديث</div>
+    <div class="q-link" onclick="alert('تعليمات: كلمة السر للطالب 1')"><i class="fas fa-info-circle"></i> تعليمات</div>
+    <div class="q-link" onclick="alert('منصة العنقود v2.5 - م. سامي غنام')"><i class="fas fa-code"></i> حول</div>
+    <div class="q-link" onclick="window.open('https://wa.me/970599000000')"> <i class="fab fa-whatsapp"></i> راسلنا</div>
+</div>
 
-            <label>🎓 اختر الصف:</label>
-            <select id="gradeSelect" onchange="updateUI()">
-                <option value="1">الأول</option>
-                <option value="2">الثاني</option>
-                <option value="3">الثالث</option>
-                <option value="4">الرابع</option>
-
-            </select>
-        </div>
-
-        <div id="lessonsGrid"></div>
-
-        <div id="teacherPanel" style="display:none; margin-top: 30px;">
-            <hr>
-            <h3>📊 سجل الحضور الذكي</h3>
-            <button class="btn btn-outline" onclick="showAttendance()">تحديث وعرض سجل الحضور</button>
-            <div id="attendanceDisplay" class="attendance-log" style="display:none;"></div>
+<div id="logoutModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>خروج نهائي؟</h3>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="btn btn-primary" onclick="closeExitModal()" style="background:#ccc; box-shadow:none;">إلغاء</button>
+            <button class="btn btn-exit" onclick="confirmHardReset()" style="box-shadow:none;">نعم</button>
         </div>
     </div>
 </div>
 
 <script>
-    // الرابط الخاص بك
-    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSSMXbaRekGZ20OjRZKOXdazKPTSp2UoyGkox1Pik7_SYOQ9T7vBh6rhujLNHe4xywfNRvNTswAhtgW/pub?gid=0&single=true&output=csv';
-    
-    let rawData = []; // سيتم ملؤه من Google Sheets
+    let rawData = [];
+    let isFetching = false;
+    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQgcyH1eQwcIUP--wK1Iv19gAMU6ufBkice9yqi-tBIu8Qm4yXP1wq97tpFPqfzSyyRpaXk3WG0j2E8/pub?gid=1094246547&single=true&output=csv';
+    const weekDaysArr = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس"];
 
-    async function fetchSheetData() {
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clockDisplay').innerText = now.toLocaleTimeString('ar-EG');
+        document.getElementById('dateDisplay').innerText = now.toLocaleDateString('ar-EG', {day:'numeric', month:'long'});
+    }
+    setInterval(updateClock, 1000);
+
+    async function loadData() {
+        if(isFetching) return;
+        isFetching = true;
+        const alertBox = document.getElementById('connAlert');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => { controller.abort(); alertBox.style.display = 'block'; }, 8000);
+
         try {
-            const response = await fetch(sheetURL);
-            const data = await response.text();
-            parseCSV(data);
-        } catch (error) {
-            console.error("خطأ في جلب البيانات:", error);
-            alert("فشل تحميل البيانات من Google Sheets");
-        }
-    }
+            const r = await fetch(sheetURL + '&t=' + Date.now(), { signal: controller.signal });
+            const t = await r.text();
+            clearTimeout(timeoutId);
+            alertBox.style.display = 'none';
 
-    function parseCSV(csvText) {
-        const lines = csvText.split('\n');
-        rawData = [];
-        // نفترض أن الترتيب: اليوم، الصف، المادة، المعلم، البدء، النهاية، الرابط
-        for (let i = 1; i < lines.length; i++) {
-            const cols = lines[i].split(',');
-            if (cols.length >= 7) {
-                rawData.push({
-                    day: cols[0].trim(),
-                    grade: cols[1].trim(),
-                    subject: cols[2].trim(),
-                    teacher: cols[3].trim(),
-                    start: cols[4].trim(),
-                    end: cols[5].trim(),
-                    link: cols[6].trim()
-                });
-            }
-        }
-        updateUI(); 
+            rawData = t.split('\n').slice(1).filter(row => row.trim() !== "").map(row => {
+                const c = row.split(',');
+                return { 
+                    day: c[0]?.trim(), 
+                    grade: c[1]?.trim(), 
+                    section: c[2]?.trim() || "أ",
+                    sub: c[3]?.trim(), 
+                    teacher: c[4]?.trim(), 
+                    s: c[5]?.trim(), 
+                    e: c[6]?.trim(), 
+                    link: c[7]?.trim() 
+                };
+            });
+            if(sessionStorage.getItem('userRole') === 'ادارة واشراف') fillTeachers();
+            updateUI();
+        } catch(e) { alertBox.style.display = 'block'; } finally { isFetching = false; }
     }
+    setInterval(loadData, 30000);
 
     function handleLogin() {
-        const code = document.getElementById('passCode').value;
+        const pass = document.getElementById('sysPass').value.trim();
         let role = '';
-        if (code === "1") role = 'student';
-        else if (code === "5") role = 'teacher';
-
-        if (role) {
-            localStorage.setItem('user_role', role);
-            if (role === 'student') Notification.requestPermission();
-            startSystem();
-        } else {
-            alert("الرمز غير صحيح!");
-        }
+        if(pass === "1") role = 'طالب';
+        else if(pass === "1111") role = 'معلم';
+        else if(pass === "1234") role = 'ادارة واشراف';
+        else { alert("الرمز غير صحيح"); return; }
+        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('userRole', role);
+        showApp();
     }
 
-    async function startSystem() {
-        const role = localStorage.getItem('user_role');
+    function showApp() {
+        const role = sessionStorage.getItem('userRole');
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('mainApp').style.display = 'block';
-        
-        if (role === 'teacher') {
-            document.getElementById('teacherPanel').style.display = 'block';
-            document.getElementById('appTitle').innerText = "لوحة التحكم 👨‍🏫";
-        } else {
-            document.getElementById('appTitle').innerText = "الجدول الدراسي";
+        document.getElementById('userBadge').innerText = role;
+        document.getElementById('userBadge').style.display = 'inline-block';
+        document.getElementById('portalTitle').innerText = 'بوابة ' + role;
+        if(role === 'ادارة واشراف') {
+            document.getElementById('adminTeacherFilter').style.display = 'block';
+            document.getElementById('adminStatsArea').style.display = 'grid';
         }
-
-        // تحديد اليوم الحالي تلقائياً
-        const daysArr = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس"];
-        const today = daysArr[new Date().getDay()];
-        if (["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس"].includes(today)) {
-            document.getElementById('daySelect').value = today;
-        }
-
-        await fetchSheetData(); // جلب البيانات أولاً
-        
-        setInterval(updateUI, 30000); 
-        if (role === 'student') scheduleNotifications();
+        const ds = document.getElementById('daySelect');
+        ds.innerHTML = '';
+        weekDaysArr.forEach(d => ds.innerHTML += `<option value="${d}">${d}</option>`);
+        ds.value = weekDaysArr[new Date().getDay()] || "الأحد";
+        loadData();
     }
 
     function updateUI() {
-        const grid = document.getElementById('lessonsGrid');
-        if (!grid) return;
-        grid.innerHTML = '';
-        
-        const selectedDay = document.getElementById('daySelect').value;
-        const selectedGrade = document.getElementById('gradeSelect').value;
-        
+        const area = document.getElementById('displayArea');
+        const day = document.getElementById('daySelect').value;
+        const grade = document.getElementById('gradeSelect').value;
+        const section = document.getElementById('sectionSelect').value || "أ";
+        const role = sessionStorage.getItem('userRole');
+        const teacher = (role === 'ادارة واشراف') ? document.getElementById('teacherSelect').value : "";
         const now = new Date();
-        const nowMins = now.getHours() * 60 + now.getMinutes();
+        const curMins = now.getHours() * 60 + now.getMinutes();
+        const isToday = (weekDaysArr[now.getDay()] === day);
 
-        const filtered = rawData.filter(item => item.day === selectedDay && item.grade === selectedGrade);
+        let filtered = rawData.filter(i => 
+            i.day === day && 
+            (grade === "" || i.grade === grade) && 
+            (section === "" || i.section === section) &&
+            (teacher === "" || i.teacher === teacher)
+        );
 
-        if (filtered.length === 0) {
-            grid.innerHTML = '<p style="text-align:center;">لا توجد حصص مجدولة لهذا الاختيار.</p>';
-            return;
-        }
-
-        filtered.forEach(lesson => {
-            const [sH, sM] = lesson.start.split(':').map(Number);
-            const [eH, eM] = lesson.end.split(':').map(Number);
-            const startTotal = sH * 60 + sM;
-            const endTotal = eH * 60 + eM;
-            const isActive = nowMins >= startTotal && nowMins < endTotal;
-
-            const card = document.createElement('div');
-            card.className = `lesson-card ${isActive ? 'active-lesson' : ''}`;
+        // --- نظام Auto-Focus الذكي للطالب والمعلم ---
+        if (role !== 'ادارة واشراف' && isToday) {
+            // 1. إخفاء الحصص التي انتهت تماماً (بعد 5 دقائق من نهايتها)
+            filtered = filtered.filter(l => curMins <= timeToVal(l.e) + 5);
             
-            let progressHtml = '';
-            if (isActive) {
-                const pct = ((nowMins - startTotal) / (endTotal - startTotal)) * 100;
-                progressHtml = `<div class="progress-container"><div class="progress-bar" style="width:${pct}%"></div></div>`;
-            }
-
-            card.innerHTML = `
-                ${progressHtml}
-                <h3 style="margin:0">${lesson.subject}</h3>
-                <p style="color:gray; font-size:0.9rem;">👨‍🏫 ${lesson.teacher}</p>
-                <p>⏰ ${lesson.start} - ${lesson.end}</p>
-                <button class="btn btn-primary" onclick="joinSession('${lesson.subject}', '${lesson.link}')">🚀 دخول الحصة</button>
-            `;
-            grid.appendChild(card);
-        });
-    }
-
-    function joinSession(subject, url) {
-        const role = localStorage.getItem('user_role');
-        if (role === 'student') {
-            let name = localStorage.getItem('student_name');
-            if (!name) {
-                name = prompt("سجل حضورك.. ادخل اسمك الثلاثي:");
-                if (name) localStorage.setItem('student_name', name);
-                else return;
-            }
-            const logs = JSON.parse(localStorage.getItem('attendance_logs') || '[]');
-            logs.push({ name, subject, time: new Date().toLocaleTimeString('ar-EG'), date: new Date().toLocaleDateString('ar-EG') });
-            localStorage.setItem('attendance_logs', JSON.stringify(logs));
+            // 2. ترتيب القائمة لجعل الحصة الجارية في الأعلى
+            filtered.sort((a, b) => {
+                const startA = timeToVal(a.s), endA = timeToVal(a.e);
+                const startB = timeToVal(b.s), endB = timeToVal(b.e);
+                const activeA = (curMins >= startA - 5 && curMins <= endA + 5);
+                const activeB = (curMins >= startB - 5 && curMins <= endB + 5);
+                if (activeA && !activeB) return -1;
+                if (!activeA && activeB) return 1;
+                return startA - startB;
+            });
         }
-        window.open(url, '_blank');
-    }
 
-    function scheduleNotifications() {
-        rawData.forEach(lesson => {
-            const [h, m] = lesson.start.split(':').map(Number);
-            const alertTime = new Date();
-            alertTime.setHours(h, m - 1, 0); 
-            const diff = alertTime.getTime() - new Date().getTime();
-            if (diff > 0) {
-                setTimeout(() => {
-                    new Notification(`🔔 اقترب موعد حصة ${lesson.subject}`, { body: "ستبدأ الحصة بعد دقيقة، استعد!" });
-                }, diff);
-            }
-        });
-    }
+        if(role === 'ادارة واشراف') {
+            let html = `<table class="admin-table"><thead><tr><th>الحصة</th><th>الوقت</th><th>الشعبة</th><th>الحالة</th></tr></thead><tbody>`;
+            filtered.forEach(l => {
+                const start = timeToVal(l.s), end = timeToVal(l.e);
+                let status = 'انتظار', color = 'var(--gray)';
+                if(isToday) {
+                    if(curMins >= start-5 && curMins <= end+5) { status = 'جارية'; color = 'var(--success)'; }
+                    else if(curMins < start) { status = 'قادمة'; color = 'var(--warning)'; }
+                    else { status = 'منتهية'; color = 'var(--danger)'; }
+                }
+                html += `<tr><td><b>${l.sub}</b><br><small>${l.teacher}</small></td><td>${l.s}-${l.e}</td><td>${l.section}</td><td style="color:${color};font-weight:bold">${status}</td></tr>`;
+            });
+            area.innerHTML = html + "</tbody></table>";
+            updateStats(filtered, isToday, curMins);
+        } else {
+            area.innerHTML = filtered.length === 0 ? "<div style='text-align:center; padding:20px; color:var(--gray)'>لا توجد حصص حالية أو قادمة</div>" : "";
+            filtered.forEach(l => {
+                const start = timeToVal(l.s), end = timeToVal(l.e);
+                let statusClass = 'btn-status-upcoming', btnText = 'انتظر الموعد', canOpen = false;
+                let cardStyle = "background:var(--card); border:1px solid var(--border);";
 
-    function showAttendance() {
-        const display = document.getElementById('attendanceDisplay');
-        const logs = JSON.parse(localStorage.getItem('attendance_logs') || '[]');
-        display.style.display = 'block';
-        if (logs.length === 0) { display.innerHTML = "لا يوجد سجل حضور حالياً."; return; }
-        const grouped = logs.reduce((acc, obj) => {
-            acc[obj.subject] = acc[obj.subject] || [];
-            acc[obj.subject].push(`• ${obj.name} (${obj.time})`);
-            return acc;
-        }, {});
-        display.innerHTML = '<h4>قائمة الحضور المسجلة:</h4>';
-        for (const sub in grouped) {
-            display.innerHTML += `<b>🔹 ${sub}:</b><br>${grouped[sub].join('<br>')}<br><br>`;
+                if(isToday) {
+                    if(curMins >= start-5 && curMins <= end+5) { 
+                        statusClass = 'btn-status-active'; btnText = 'دخول الحصة الآن'; canOpen = true; 
+                        cardStyle = "background:rgba(16, 185, 129, 0.05); border:2px solid var(--success);";
+                    }
+                }
+
+                area.innerHTML += `<div style="${cardStyle} padding:15px; border-radius:20px; margin-bottom:10px; text-align:right;">
+                    <b>${l.sub} - شعبة (${l.section})</b> <span style="float:left; color:var(--primary)">${l.s} - ${l.e}</span><br>
+                    <small>المعلم: ${l.teacher} | الصف: ${l.grade}</small>
+                    <button class="btn ${statusClass}" style="margin-top:10px;" ${canOpen ? `onclick="window.open('${l.link}')"` : 'disabled'}>
+                        ${btnText}
+                    </button>
+                </div>`;
+            });
         }
     }
 
-    function logout() { localStorage.clear(); location.reload(); }
-    
-    // التحقق عند فتح الصفحة
-    window.onload = () => {
-        if (localStorage.getItem('user_role')) startSystem();
-    };
+    function updateStats(data, isToday, curMins) {
+        if(!isToday) { 
+            document.getElementById('statActiveCount').innerText = "-"; 
+            document.getElementById('statDoneCount').innerText = "-";
+            document.getElementById('statProgress').innerText = "0%";
+            return; 
+        }
+        const active = data.filter(i => curMins >= timeToVal(i.s)-5 && curMins <= timeToVal(i.e)+5).length;
+        const done = data.filter(i => curMins > timeToVal(i.e)+5).length;
+        document.getElementById('statActiveCount').innerText = active;
+        document.getElementById('statDoneCount').innerText = done;
+        document.getElementById('statProgress').innerText = data.length ? Math.round((done/data.length)*100) + "%" : "0%";
+    }
+
+    function fillTeachers() {
+        const ts = document.getElementById('teacherSelect');
+        const list = [...new Set(rawData.map(i => i.teacher))].filter(n => n);
+        ts.innerHTML = '<option value="">كل المعلمين</option>';
+        list.forEach(t => ts.innerHTML += `<option value="${t}">${t}</option>`);
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+        const icon = document.getElementById('themeIcon');
+        icon.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun theme-toggle' : 'fas fa-moon theme-toggle';
+    }
+
+    function timeToVal(t) { if(!t) return 0; const c = t.split(':'); return parseInt(c[0])*60 + parseInt(c[1]); }
+    function handleLogout() { sessionStorage.clear(); location.reload(); }
+    function showExitModal() { document.getElementById('logoutModal').style.display = 'flex'; }
+    function closeExitModal() { document.getElementById('logoutModal').style.display = 'none'; }
+    function confirmHardReset() { sessionStorage.clear(); window.location.replace("https://www.google.ps"); }
+    window.onload = () => { updateClock(); if(sessionStorage.getItem('isLoggedIn')) showApp(); };
 </script>
 </body>
 </html>
